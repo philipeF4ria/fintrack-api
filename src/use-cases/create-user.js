@@ -4,6 +4,8 @@ import bcrypt from "bcrypt";
 import { PostgresCreateUserRepository } from "../repositories/postgres/create-user.js";
 import { PostgresGetUserByEmailRepository } from "../repositories/postgres/get-user-by-email.js";
 
+import { EmailAlreadyInUseError } from "../errors/user.js";
+
 class CreateUserUseCase {
   async execute(createUserParams) {
     const postgresGetUserByEmailRepository =
@@ -13,7 +15,7 @@ class CreateUserUseCase {
       await postgresGetUserByEmailRepository.execute(createUserParams.email);
 
     if (userWithProvidedEmail) {
-      throw new Error("The provided e-mail is already in use.");
+      throw new EmailAlreadyInUseError(createUserParams.email);
     }
 
     const userId = uuidv4();
